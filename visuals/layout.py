@@ -9,5 +9,5 @@ def safe_metric(label, value, format_str="{:.2f}", suffix=""):
     if value is not None:
         st.metric(label, format_str.format(value) + suffix)
     else:
-        st.text("Debt-to-Equity")
+        st.text(label)
         st.caption(f"⚠️ {label} not available.")
