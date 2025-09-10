@@ -1,6 +1,8 @@
 from data.fetcher import get_company_info
+from utils.constants import VALUATION_LABELS
 
 def calculate_forward_peg(info):
+    """PE / Earnings Growth"""
     pe = info.get("forwardPE")
     growth = info.get("earningsGrowth")
 
@@ -9,6 +11,7 @@ def calculate_forward_peg(info):
     return None
 
 def get_valuation_metrics(ticker):
+    """Calculate valuation metrics and return as a series."""
 
     info = get_company_info(ticker)
 

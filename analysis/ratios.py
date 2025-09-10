@@ -1,16 +1,25 @@
+# analysis/ratios.py
+
 import pandas as pd
-import streamlit as st
+# import streamlit as st
 from data.fetcher import get_value_by_label
 
-# PE, PB, EV/EBITDA, etc.
+def calculate_ratios(financials, balance_sheet):
+    """Calculate all financial ratios and return as a series."""
 
+    series = {
+        "Profit Margin": calculate_profit_margin(financials),
+        "ROE": calculate_ROE(financials, balance_sheet),
+        "Debt-to-Equity": calculate_DE_ratio(balance_sheet),
+        "Current Ratio": calculate_current_ratio(balance_sheet),
+        "Quick Ratio": calculate_quick_ratio(balance_sheet)
+    }
+    return series
+    
 
 def calculate_profit_margin(financials: pd.DataFrame) -> float:
     """Net Income / Revenue"""
     try:
-        # st.dataframe(get_row_safe(financials, 'Total Revenue'))
-        # st.dataframe(get_row_safe(financials, 'Net Income'))
-
         revenue = get_value_by_label(financials, ['Total Revenue', 'Revenue'])[0]
         net_income = get_value_by_label(financials, ['Net Income'])[0]
 
@@ -33,7 +42,7 @@ def calculate_ROE(financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> floa
 def calculate_DE_ratio(balance_sheet: pd.DataFrame) -> float:
     """Total Liabilities / Shareholder Equity"""
     try:
-        liabilities = get_value_by_label(balance_sheet, ['Total Liabilities'])[0]
+        liabilities = get_value_by_label(balance_sheet, ['Total Liabilities'])
 
         if liabilities == None:
             current_liabilities = get_value_by_label(balance_sheet, ['Current Liabilities'])
@@ -41,13 +50,12 @@ def calculate_DE_ratio(balance_sheet: pd.DataFrame) -> float:
             if current_liabilities is None and non_current_liabilities is None:
                 return None
 
-            liabilities = non_current_liabilities + current_liabilities
+            calculated_liab = non_current_liabilities[0] + current_liabilities[0]
 
         equity = get_value_by_label(balance_sheet, ['Stockholders Equity', 'Total Stockholders Equity'])[0]
-        return liabilities / equity
+        return calculated_liab / equity
     
-    except (KeyError, IndexError, TypeError):
-        # st.warning("Could not find Total Liabilities for this ticker:")
+    except (KeyError, IndexError):
         return None
 
 

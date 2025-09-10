@@ -3,39 +3,17 @@ import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
 
-from data.fetcher import (
-    get_price_history,
-    get_financial_statements,
-)
+from data.fetcher import (get_price_history, get_financial_statements)
+from utils.constants import RATIO_LABELS, GROWTH_LABELS, VALUATION_LABELS, CF_LABELS, STOCK_LABELS
 
-from analysis.ratios import (
-    calculate_profit_margin,
-    calculate_ROE,
-    calculate_DE_ratio,
-    calculate_current_ratio,
-    calculate_quick_ratio,
-)
-
-from analysis.performance import (
-    calculate_fcf,
-    calculate_fcf_margin,
-    calculate_operating_margin,
-    calculate_asset_turnover,
-    calculate_interest_coverage,
-    calculate_stock_metrics
-)
-
-from analysis.valuation import (get_valuation_metrics)
-from analysis.growth import(calculate_fcf1, get_metric_series, calculate_growth_series)
-from visuals.layout import (safe_metric)
+from analysis.ratios import calculate_ratios
+from analysis.valuation import get_valuation_metrics
 from visuals.charts import (plot_stocks, growth_line_chart)
 
-GROWTH_LABELS = [
-    "Total Revenue",
-    "Net Income",
-    "Diluted EPS",
-    "Free Cash Flow"
-]
+from analysis.performance import ( calculate_efficiency_metrics, calculate_fcf, calculate_stock_metrics)
+
+from analysis.growth import(get_metric_series, calculate_growth_series)
+from visuals.layout import (safe_metric, safe_df, col_display_compare, display_insights)
 
 
 def main():
@@ -51,43 +29,41 @@ def main():
 
     if ticker1:
 
-        # core financial ratios
+        # get info from ticker needed for calculations
         financials, balance_sheet, cash_flows = get_financial_statements(ticker1)
         hist1 = get_price_history(ticker1)
 
+        # if comparing, get ticker2 info
         if ticker2:
             financials2, balance_sheet2, cash_flows2 = get_financial_statements(ticker2)
             hist2 = get_price_history(ticker2)
 
-        # stock metrics
+        # -----------------------------------#
+        #   Core Financial Ratios
+        # -----------------------------------#
         if display == "Core Financial Ratios":
 
             st.header("📌 Core Financial Ratios")
-            col1, col2 = st.columns(2)
 
-            with col1:
-                st.subheader(ticker1)
-                st.markdown("<hr style='margin-top: -10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
+            ratio_metrics1 = calculate_ratios(financials, balance_sheet)
+            ratios1 = [ratio_metrics1[r] for r in ratio_metrics1 if r in RATIO_LABELS]
 
-                safe_metric('Profit Margin',calculate_profit_margin(financials), "{:.2%}")
-                safe_metric('ROE', calculate_ROE(financials, balance_sheet), "{:.2%}")
-                safe_metric('Debt-to-Equity', calculate_DE_ratio(balance_sheet), "{:.2%}")
-                safe_metric('Current Ratio', calculate_current_ratio(balance_sheet), "{:.2%}")
-                safe_metric('Quick Ratio', calculate_quick_ratio(balance_sheet), "{:.2%}")
+            # st.text(ratio_metrics1['Debt-to-Equity'])
 
             if ticker2:
-                with col2:
-                    st.subheader(ticker2)
-                    st.markdown("<hr style='margin-top: -10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-                    safe_metric('Profit Margin',calculate_profit_margin(financials2), "{:.2%}")
-                    safe_metric('ROE', calculate_ROE(financials2, balance_sheet2), "{:.2%}")
-                    safe_metric('Debt-to-Equity', calculate_DE_ratio(balance_sheet2), "{:.2%}")
-                    safe_metric('Current Ratio', calculate_current_ratio(balance_sheet2), "{:.2%}")
-                    safe_metric('Quick Ratio', calculate_quick_ratio(balance_sheet2), "{:.2%}")
-            # else
-            # give insights to company1 metrics?
+                left = [ticker1] + ratios1
+                ratio_metrics2 = calculate_ratios(financials2, balance_sheet2)
+                ratios2 = [ratio_metrics2[r] for r in ratio_metrics2 if r in RATIO_LABELS]
+                right = [ticker2] + ratios2
+                col_display_compare(left, right, RATIO_LABELS, RATIO_LABELS)
+            else:
+                # get insights
+                insights = ["Insights"] + ["test" for _ in range(len(RATIO_LABELS))]
+                display_insights(ratios1, insights, RATIO_LABELS)
 
-
+        # -----------------------------------#
+        #  Growth Metrics
+        # -----------------------------------#
         elif display == "Growth Metrics":
             st.title("📈 Growth Metrics")
 
@@ -98,65 +74,110 @@ def main():
             for tab, label in zip(tabs, GROWTH_LABELS):
                 with tab:
                     if label == "Free Cash Flow":
-                        series = calculate_fcf1(cash_flows)
-                    else: series = get_metric_series(financials, label)
+                        series1 = calculate_fcf(cash_flows)
+                        # series1.name = label
 
-                    if series is not None:
-                        growth = calculate_growth_series(series)
+                        # if ticker2:
+                        #     series2 = calculate_fcf(cash_flows2)
+                        #     # series2.name = 
+                    else: 
+                        series1 = get_metric_series(financials, label)
+                        # series2 = get_metric_series(financials2, label)
+
+                    if series1 is not None:
+                        growth = calculate_growth_series(series1)
                         st.plotly_chart(growth_line_chart(label, growth), use_container_width=True)
 
+                        # if ticker2:
+                        #     table_display_compare(series1, series2)
+                        # else:
                         st.table(growth)
                     else:
                         st.caption(f"⚠️ {label} data not available.")
 
-
+        # -----------------------------------#
+        #   Cash Flow & Efficiency
+        # -----------------------------------#
         elif display == "Cash Flow & Efficiency":
             # st.text("Free Cash Flow, FCF Margin, Operating Margin, Asset Turnover")
             st.title("⚙️ Efficiency Metrics")
 
-            st.dataframe(cash_flows)
+            # st.dataframe(cash_flows)
+            efficiency_metrics1 = calculate_efficiency_metrics(cash_flows, financials, balance_sheet)
+            efficiency1 = [efficiency_metrics1[e] for e in efficiency_metrics1 if e in CF_LABELS]
+            
+            tables = []
+            if ticker2:
+                efficiency_metrics2 = calculate_efficiency_metrics(cash_flows2, financials2, balance_sheet2)
+                efficiency2 = [efficiency_metrics2[e] for e in efficiency_metrics2 if e in CF_LABELS]
 
-            # safe_metric("Free Cash Flows", calculate_fcf(cash_flows))
-            # safe_metric("FCF Margin", calculate_fcf_margin(cash_flows, financials))
+                tables = []
+                for a, b, l in zip(efficiency1, efficiency2, CF_LABELS):
+                    a.name = ticker1
+                    b.name = ticker2 
 
-            st.dataframe(calculate_fcf(cash_flows))
-            # safe_metric("Operating Margin", calculate_operating_margin(financials))
-            # safe_metric("Asset Turnover", calculate_asset_turnover(financials, balance_sheet))
-            # safe_metric("Interest Coverage", calculate_interest_coverage(financials))
+                    st.subheader(l)
+                    st.dataframe(pd.concat([a,b], axis=1).dropna())
+
+                    # insights
+            else:
+                # insights
+                for e, l in zip(efficiency1, CF_LABELS):
+                    e.name = l
+                    st.dataframe(e)
 
 
+            
+            # st.table(tables)
+            # for t in tables:
+            #     st.table(tables)
+            # col_display_compare(tables, insights, CF_LABELS)
+
+
+        # -----------------------------------#
+        #   Valuation Metrics
+        # -----------------------------------#
         elif display == "Valuation Metrics":
-            # st.text("Price-to-Earnings, Forward PE, Price-to-Book, EV/EBITA, PEG Ratio")
             st.header("💰 Valuation Metrics")
 
-            valuation = get_valuation_metrics(ticker1)
+            # get valuation calculations as series, good for scalability
+            valuation_series = get_valuation_metrics(ticker1)
+            valuation1 = [valuation_series[m] for m in valuation_series if m in VALUATION_LABELS]
 
-            col1, col2, col3 = st.columns(3)
-            safe_metric("Trailing P/E", valuation["Trailing P/E"], "{:.2f}")
-            safe_metric("Forward P/E", valuation["Forward P/E"], "{:.2f}")
-            safe_metric("PEG Ratio", valuation["PEG Ratio"], "{:.2f}")
-            safe_metric("Price-to-Book", valuation["Price-to-Book"], "{:.2f}")
-            safe_metric("Market Cap", valuation["Market Cap"], "{:,.0f}", suffix=" USD")
+            left = [ticker1] + valuation1
+            right = left
 
+            if ticker2:
+                valuation_series2 = get_valuation_metrics(ticker2)
+                valuation2 = [valuation_series2[m] for m in valuation_series2 if m in VALUATION_LABELS]
+                right = [ticker2] + valuation2
+                col_display_compare(left, right, VALUATION_LABELS, VALUATION_LABELS)
+            else:
+                col_display_compare(left, right, VALUATION_LABELS)
 
+        # -----------------------------------#
+        #   Stock Metrics
+        # -----------------------------------#
         elif display == "Stock Performance Metrics":
-            st.text("Volatility, Sharpe Ratio, Drawdown Analysis, Moving Averages, RSI / MACD ?")
-            # plot historical prices
+            # plot historical stock prices
             st.title("📉 Stock Performance Metrics")
 
             plot_stocks(ticker1)
             
-            metrics = calculate_stock_metrics(hist1)
-            safe_metric("Volatility", metrics["Volatility"], "{:.2f}")
-            safe_metric("Sharpe Ratio", metrics["Sharpe Ratio"], "{:.2f}")
-            safe_metric("Max Drawdown", metrics["Max Drawdown"], "{:.2f}")
-            safe_metric("Cumulative Return", metrics["Cumulative Return"], "{:.2f}")
+            stock_series1 = calculate_stock_metrics(hist1)
+            stocks1 = [stock_series1[s] for s in stock_series1 if s in STOCK_LABELS]
+            
+            left = [ticker1] + stocks1
 
-
-            # fig = go.Figure()
-            # fig.add_trace(go.Scatter(x=hist1.index, y=hist1['Close'], name=ticker1))
-            # fig.update_layout(title=f"{ticker1} Closing Price (1Y)", xaxis_title="Date", yaxis_title="Price")
-            # st.plotly_chart(fig, use_container_width=True)
+            if ticker2:
+                stock_series2 = calculate_stock_metrics(hist2)
+                stocks2 = [stock_series2[s] for s in stock_series2 if s in STOCK_LABELS]
+                right = [ticker2] + stocks2
+                col_display_compare(left, right, STOCK_LABELS, STOCK_LABELS)
+            else:
+                right = left
+                col_display_compare(left, right, STOCK_LABELS)
+            
 
     else:
         st.warning("Please enter primary ticker symbol")

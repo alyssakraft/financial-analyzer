@@ -34,13 +34,3 @@ def get_growth_metrics(financials):
             growth = calculate_growth_series(series)
             metrics[label] = growth
     return metrics
-
-def calculate_fcf1(cashflow):
-    try:
-        operating_cf = cashflow.loc["Total Cash From Operating Activities"]
-        capex = cashflow.loc["Capital Expenditures"]
-        fcf = operating_cf - capex
-        fcf.index = pd.to_datetime(fcf.index).year
-        return fcf.sort_index()
-    except KeyError:
-        return None
