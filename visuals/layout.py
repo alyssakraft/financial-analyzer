@@ -3,6 +3,35 @@
 import streamlit as st
 import pandas as pd
 from utils.constants import RATIO_LABELS, GROWTH_LABELS, VALUATION_LABELS, CF_LABELS, STOCK_LABELS
+from data.metric_data import MetricData
+
+
+def safe_metricData(m: MetricData):
+    if m.value is not None and m.delta is None:
+        st.metric(m.name, m.formatted_value())
+    elif m.delta is not None:
+        st.metric(m.name, m.formatted_value(), delta=f"{m.delta:.2f}")
+    else:
+        st.text(m.name)
+        st.caption(f"⚠️ {m.name} not available.")
+
+
+def display_MetricData(label, data: dict, insights=None):
+    st.subheader(label)
+    st.markdown("<hr style='margin-top: -10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
+
+    for name, val in data.items():
+        if isinstance(val, MetricData):
+            safe_metricData(val)
+        else:
+            safe_metric(name, val)
+
+        
+        if insights is not None and name in insights:
+                st.text(insights[name])
+        st.markdown("<hr style='margin-top: -10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
+
+    return
 
 
 def safe_metric(label, value, format_str="{:.2f}", suffix="", delta=None):
@@ -28,40 +57,11 @@ def safe_df(label, df):
     else:
         st.caption(f"⚠️ {label} not available.")
 
-def safe_df_combined(label, df1, df2):
-    if not df1.empty and not df2.empty:
-        combined = pd.concat([df1, df2], axis=1)
-        combined.name = label
-        st.dataframe(combined)
-    # elif df2.empty:
-    else:
-        st.caption(f"⚠️ {label} not available.")
-
-
-def is_tuple(d):
-    return all(isinstance(v, tuple) for v in d.values())
-
-
-def display_metric(label, data: dict, insights=None):
-    st.subheader(label)
-    st.markdown("<hr style='margin-top: -10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-
-    if is_tuple(data):
-        for d, (val, delta) in data.items():
-            safe_metric(d, val, delta=delta)
-            if insights is not None and d in insights:
-                st.text(insights[d])
-            st.markdown("<hr style='margin-top: -10px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-
-    else:
-        for d, val in data.items():
-            safe_metric(d, val)
-
-
 
 def col_display_metric(tickers, data1, data2):
-    col1, col2 = st.columns(len(tickers))
+    col1, col2 = st.columns(2)
     with col1: 
-        display_metric(tickers[0], data1)
+        display_MetricData(tickers[0], data1)
     with col2:
-        display_metric(tickers[1], data2)
+        display_MetricData(tickers[1], data2)
+

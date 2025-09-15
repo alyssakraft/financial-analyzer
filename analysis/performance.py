@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from data.fetcher import get_value_by_label
 import streamlit as st
+from data.metric_data import MetricData
+from utils.constants import VOLATILITY, SHARPE_RATIO, MAX_DRAWDOWN, CUMULATIVE_RETURN
 
 def calculate_fcf(cash_flows):
     """Free Cash Flow = Operating Cash Flow − Capital Expenditures"""
@@ -101,8 +103,8 @@ def calculate_stock_metrics(price_df, risk_free_rate=0.015):
     max_drawdown = drawdown.min()
 
     return {
-        "Volatility": volatility,
-        "Sharpe Ratio": sharpe_ratio,
-        "Max Drawdown": max_drawdown,
+        VOLATILITY: MetricData(VOLATILITY, volatility, fmt="{:.2%}"),
+        SHARPE_RATIO: MetricData(SHARPE_RATIO, sharpe_ratio),
+        MAX_DRAWDOWN: MetricData(MAX_DRAWDOWN, max_drawdown, fmt="{:.2%}"),
         "Cumulative Return": cumulative_return
     }

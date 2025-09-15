@@ -8,6 +8,11 @@ def get_stock_object(ticker: str):
     """return yfinance ticker"""
     return yf.Ticker(ticker)
 
+def get_company_name(ticker: str):
+    """fetch company name from ticker"""
+    stock = get_stock_object(ticker)
+    return stock.info.get("shortName", ticker)
+
 
 def get_price_history(ticker: str, period="1y", interval="1d"):
     """fetch historical price data"""

@@ -1,6 +1,8 @@
 # revenue, net income, EPS growth
 
 import pandas as pd
+import streamlit as st
+from analysis.performance import calculate_fcf
 
 def calculate_growth_series(series):
     """
@@ -9,28 +11,20 @@ def calculate_growth_series(series):
     """
     return series.pct_change().dropna()
 
-def get_metric_series(financials, label):
+def get_metric_series(financials, cash_flows, label):
     """
     Extracts a time series for a given label from the financials DataFrame.
     Returns a Series indexed by year.
     """
     if label not in financials.index:
-        return None
-
-    series = financials.loc[label]
+        if label == "Free Cash Flow":
+            series = calculate_fcf(cash_flows)
+    else:
+        series = financials.loc[label]
     # Ensure index is datetime or year
-    if not isinstance(series.index[0], (int, float)):
-        series.index = pd.to_datetime(series.index).year
+        if not isinstance(series.index[0], (int, float)):
+            # st.table(series)
+            series.index = pd.to_datetime(series.index).year
+        
     return series.sort_index()
 
-def get_growth_metrics(financials):
-    """
-    Returns a dictionary of growth rates for key metrics.
-    """
-    metrics = {}
-    for label in ["Total Revenue", "Net Income", "Diluted EPS", "Free Cash Flow"]:
-        series = get_metric_series(financials, label)
-        if series is not None:
-            growth = calculate_growth_series(series)
-            metrics[label] = growth
-    return metrics
