@@ -46,17 +46,6 @@ def safe_metric(label, value, format_str="{:.2f}", suffix="", delta=None):
         st.text(label)
         st.caption(f"⚠️ {label} not available.")
 
-def safe_df(label, df):
-    """
-    Displays a Streamlit datafram if value is valid, otherwise shows a caption.
-    """
-
-    if not df.empty:
-        df.name = label
-        st.dataframe(df)
-    else:
-        st.caption(f"⚠️ {label} not available.")
-
 
 def col_display_metric(tickers, data1, data2):
     col1, col2 = st.columns(2)

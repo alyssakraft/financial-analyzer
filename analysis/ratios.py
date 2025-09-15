@@ -28,7 +28,7 @@ def calculate_profit_margin(financials: pd.DataFrame):
         curr = net_income[0] / revenue[0]
         prev = net_income[1] / revenue[1]
 
-        return MetricData(PM, curr, format_delta(curr, prev), "{:.2%}")
+        return MetricData(PM, curr, format_delta(curr, prev, True), "{:.2%}")
 
     except (KeyError, IndexError, TypeError):
         return None
@@ -43,7 +43,7 @@ def calculate_ROE(financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> floa
         curr = net_income[0] / equity[0]
         prev = net_income[1] / equity[1]
 
-        return MetricData(ROE, curr, format_delta(curr, prev), "{:.2%}")
+        return MetricData(ROE, curr, format_delta(curr, prev, True), "{:.2%}")
 
     except (KeyError, IndexError, TypeError):
         return None

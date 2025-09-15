@@ -1,9 +1,12 @@
 # format numbers, percentages, currency, etc.
 
-def format_delta(current, previous):
+def format_delta(current, previous, pct=False):
     if previous is [None, 0]:
         return None
-    return (current - previous) / abs(previous) * 100
+    if pct:
+        return (current - previous) / abs(previous) * 100
+    else:
+        return current - previous
 
 def format_currency(value, currency="$", decimals=2):
     if value is None:

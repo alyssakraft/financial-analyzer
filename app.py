@@ -15,7 +15,7 @@ from analysis.performance import ( calculate_efficiency_metrics, calculate_stock
 
 from analysis.growth import(get_metric_series, calculate_growth_series)
 from visuals.layout import (col_display_metric, display_MetricData)
-from analysis.insights import (ratio_insights)
+from analysis.insights import (ratio_insights, valuation_insights)
 from utils.formatter import format_large_number
 
 
@@ -130,7 +130,7 @@ def main():
 
 
         # -----------------------------------#
-        #   Valuation Metrics -- ADD INSIGHTS
+        #   Valuation Metrics -- DONE
         # -----------------------------------#
         elif display == "Valuation Metrics":
             st.header("💰 Valuation Metrics")
@@ -142,7 +142,9 @@ def main():
                 valuation_series2 = get_valuation_metrics(ticker2)
                 col_display_metric(tickers, valuation_series1, valuation_series2)
             else:
-                display_MetricData(ticker1_name, valuation_series1)
+                insights = valuation_insights(valuation_series1)
+                display_MetricData(ticker1_name, valuation_series1, insights)
+                
 
         # -----------------------------------#
         #   Stock Metrics -- CHANGE CUMULATIVE RETURN TO GRAPH
