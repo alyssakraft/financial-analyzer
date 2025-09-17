@@ -26,7 +26,7 @@ A web app for retrieving and analyzing company financial metrics, built with Str
 
 ## Installation
 
-# 1. Clone this repository:
+### 1. Clone this repository:
    ```bash
    git clone https://github.com/your-username/financial-analyzer.git
    cd financial-analyzer
