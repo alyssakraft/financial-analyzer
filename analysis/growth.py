@@ -17,8 +17,10 @@ def get_metric_series(financials, cash_flows, label):
     Returns a Series indexed by year.
     """
     if label not in financials.index:
-        if label == "Free Cash Flow":
+        if label == "Free Cash Flows":
             series = calculate_fcf(cash_flows)
+        else:
+            return None
     else:
         series = financials.loc[label]
     # Ensure index is datetime or year

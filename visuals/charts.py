@@ -22,9 +22,15 @@ def growth_line_chart(ticker, data, ticker2=None, data2=None):
     # st.text(ticker )
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=data.index, y=data.values, mode='lines+markers', name=data.name))
+    fig.add_trace(go.Scatter(
+        x=data.index.astype(str), 
+        y=data.values, 
+        mode='lines+markers', 
+        name=data.name
+    ))
 
-
+    # Ensure x-axis treats values as categories
+    fig.update_xaxes(type='category')  
     fig.update_layout(title=f"{ticker} {data.name} Growth Over Time", xaxis_title="Year", yaxis_title="Percent Change", yaxis_tickformat=".2%")
 
     st.plotly_chart(fig, use_container_width=True)

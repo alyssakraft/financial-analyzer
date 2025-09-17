@@ -4,6 +4,14 @@ import pandas as pd
 import streamlit as st
 
 
+def ticker_exists(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        return info is not None and info.get("regularMarketPrice") is not None
+    except Exception:
+        return False
+
 def get_stock_object(ticker: str):
     """return yfinance ticker"""
     return yf.Ticker(ticker)

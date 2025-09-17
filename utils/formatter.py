@@ -28,3 +28,17 @@ def format_large_number(value):
         return f"{value / 1_000:.2f}K"
     else:
         return str(value)
+
+    
+def highlight_df_bounds(df, lower=None, upper=None, low_color='lightcoral', high_color='yellow'):
+    numeric_cols = df.select_dtypes(include='number').columns
+
+    def style_func(s):
+        return [
+            f'color: {low_color}' if (lower is not None and v < lower)
+            else f'color: {high_color}' if (upper is not None and v > upper)
+            else ''
+            for v in s
+        ]
+
+    return df.style.apply(style_func, subset=numeric_cols)

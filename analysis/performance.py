@@ -6,6 +6,7 @@ import pandas as pd
 from data.fetcher import get_value_by_label
 import streamlit as st
 from data.metric_data import MetricData
+from utils.formatter import format_large_number
 from utils.constants import VOLATILITY, SHARPE_RATIO, MAX_DRAWDOWN, CUMULATIVE_RETURN
 
 def calculate_fcf(cash_flows):
@@ -74,6 +75,7 @@ def calculate_interest_coverage(financials):
     except KeyError:
         return None
     
+
 def calculate_efficiency_metrics(cash_flows, financials, balance_sheet):
     """Calculate efficiency metrics and return as a series"""
     series = {
@@ -81,11 +83,10 @@ def calculate_efficiency_metrics(cash_flows, financials, balance_sheet):
         "FCF Margin": calculate_fcf_margin(cash_flows, financials),
         "Operating Margin": calculate_operating_margin(financials),
         "Asset Turnover": calculate_asset_turnover(financials, balance_sheet),
-        "Interest Coverage": calculate_interest_coverage(financials)
+        # "Interest Coverage": calculate_interest_coverage(financials)
     }
 
     return series
-    pass
 
 
 def calculate_stock_metrics(price_df, risk_free_rate=0.015):

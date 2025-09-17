@@ -11,7 +11,7 @@ RATIO_LABELS = [PM, ROE, DE, CR, QR]
 REVENUE = "Total Revenue"
 NET_INCOME = "Net Income"
 DILUTED_EPS = "Diluted EPS"
-FCF = "Free Cash Flow"
+FCF = "Free Cash Flows"
 
 GROWTH_LABELS = [REVENUE, NET_INCOME, DILUTED_EPS, FCF]
 
@@ -19,8 +19,15 @@ FCF_MARGIN = "FCF Margin"
 OP_MARGIN = "Operating Margin"
 AT = "Asset Turnover"
 INTEREST_COVERAGE = "Interest Coverage"
+CF_LABELS = [FCF, FCF_MARGIN, OP_MARGIN, AT]
 
-CF_LABELS = [FCF, FCF_MARGIN, OP_MARGIN, AT, INTEREST_COVERAGE]
+CF_BOUNDS = {
+    FCF: None,
+    FCF_MARGIN: (.05, .20),  # typical FCF margin is between 5% and 15-20%
+    OP_MARGIN: (.1, .30), # typical operating margin is between 10% and 25-30%
+    AT: (0.5, 2.0), # typical asset turnover is between 0.5 and 2.0
+    INTEREST_COVERAGE: (1, None)  # generally, a ratio above 1.5 is considered good
+}
 
 TRAILING_PE = "Trailing P/E"
 FORWARD_PE = "Forward P/E"
