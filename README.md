@@ -13,10 +13,10 @@ A web app for retrieving and analyzing company financial metrics, built with Str
 
 ## Tech Stack
 
-- **Frontend / UI**: [Streamlit](https://streamlit.io/)
-- **Data Handling**: [pandas](https://pandas.pydata.org/)
-- **Data Source**: [yfinance](https://pypi.org/project/yfinance/)
-- **Language**: Python 3.9+
+- **Frontend / UI**: `[Streamlit](https://streamlit.io/)`
+- **Data Handling**: `[pandas](https://pandas.pydata.org/)`
+- **Data Source**: `[yfinance](https://pypi.org/project/yfinance/)`
+- **Language**: `Python 3.9+`
 
 ## Installation
 
