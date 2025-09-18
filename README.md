@@ -46,38 +46,6 @@ Link: https://ak-financial-analyzer.streamlit.app/
 
 ![App Screenshot] images/screenshot.png
 
-## Project Structure
-
-financial-analyzer/ 
-
-├── app.py # Main Streamlit app entry point 
-
-├── data/ 
-
-│     ├── fetcher.py          # Retrieves and labels financial data from yfinance 
-
-│     └── metric_data.py      # Defines metric labels and mappings 
-
-├── analysis/ 
-
-│     ├── growth.py           # Calculates revenue and net income growth metrics 
-
-│     └── performance.py      # Computes efficiency metrics (FCF, margins, turnover) 
-
-├── utils/ 
-
-│     ├── formatter.py        # Formats numbers and commentary for display 
-
-│     └── constants.py        # Stores metric keys and threshold bounds 
-
-├── images/ 
-
-│     └── screenshot.png      # App screenshot for README 
-
-├── requirements.txt          # Dependency list for deployment 
-
-└── README.md                 # Project overview and usage instructions
-
 ## Design Philosophy
 
 This app was built with modularity and clarity in mind:
