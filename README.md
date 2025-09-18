@@ -2,6 +2,8 @@
 
 A web app for retrieving and analyzing company financial metrics, built with Streamlit and pandas, using real-time data from Yahoo Finance.
 
+Link: (https://ak-financial-analyzer.streamlit.app/)
+
 ## Features
 
 - Ticker Analysis: Pulls financial data using yfinance
