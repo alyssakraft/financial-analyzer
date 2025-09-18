@@ -2,8 +2,6 @@
 
 A web app for retrieving and analyzing company financial metrics, built with Streamlit and pandas, using real-time data from Yahoo Finance.
 
----
-
 ## Features
 
 - Ticker Analysis: Pulls financial data using yfinance
@@ -13,16 +11,12 @@ A web app for retrieving and analyzing company financial metrics, built with Str
 - Outlier Detection: Highlights abnormal values with color-coded commentary
 - Error Handling: Gracefully manages missing or malformed data
 
----
-
 ## Tech Stack
 
 - **Frontend / UI**: [Streamlit](https://streamlit.io/)
 - **Data Handling**: [pandas](https://pandas.pydata.org/)
 - **Data Source**: [yfinance](https://pypi.org/project/yfinance/)
 - **Language**: Python 3.9+
-
----
 
 ## Installation
 
@@ -60,7 +54,7 @@ This app was built with modularity and clarity in mind:
 
 ## Future Enhancements
 
-- Toggle between quarter annual data
+- Toggle between quarterly and annual data
 - Export charts and commentary to pdf
 
 ## Author
