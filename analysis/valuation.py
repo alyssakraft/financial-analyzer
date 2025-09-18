@@ -13,6 +13,8 @@ def calculate_forward_peg(info):
         return pe / (growth * 100) if growth != 0 else None
     return None
 
+# store valuation metrics in cache for performance
+@st.cache_data
 def get_valuation_metrics(ticker):
     """Calculate valuation metrics and return as a series."""
 

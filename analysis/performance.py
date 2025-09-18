@@ -76,6 +76,8 @@ def calculate_interest_coverage(financials):
         return None
     
 
+# store calculated efficiency metrics in cache for performance
+@st.cache_data
 def calculate_efficiency_metrics(cash_flows, financials, balance_sheet):
     """Calculate efficiency metrics and return as a series"""
     series = {
@@ -88,7 +90,8 @@ def calculate_efficiency_metrics(cash_flows, financials, balance_sheet):
 
     return series
 
-
+# store calculated stock metrics in cache for performance
+@st.cache_data
 def calculate_stock_metrics(price_df, risk_free_rate=0.015):
     price_df['Return'] = price_df['Close'].pct_change()
     daily_returns = price_df['Return'].dropna()

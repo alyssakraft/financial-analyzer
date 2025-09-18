@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 from data.metric_data import MetricData
 
-
+# store page header in cache for performance
 def get_page_header(title, subtitle=None):
     """
     Displays a page header with an optional subtitle in Streamlit.

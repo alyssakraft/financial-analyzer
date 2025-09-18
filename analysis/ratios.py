@@ -7,6 +7,8 @@ from data.metric_data import MetricData
 from utils.formatter import format_delta
 from utils.constants import PM, ROE, DE, CR, QR
 
+# store calculated ratios in cache for performance
+@st.cache_data
 def calculate_ratios(financials, balance_sheet):
     """Calculate all financial ratios and return as a series."""
     series = {

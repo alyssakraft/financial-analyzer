@@ -1,41 +1,33 @@
 import streamlit as st
-import yfinance as yf
 import pandas as pd
-import plotly.graph_objects as go
-
-from utils.constants import GROWTH_LABELS, VALUATION_LABELS, CF_LABELS, STOCK_LABELS, CF_BOUNDS
 
 from data.fetcher import (ticker_exists, get_company_name, get_price_history, get_financial_statements)
+from utils.constants import GROWTH_LABELS, CF_LABELS, CF_BOUNDS
 
 from analysis.ratios import calculate_ratios
+from analysis.growth import(get_growth_metrics, calculate_growth_series)
 from analysis.valuation import get_valuation_metrics
 from visuals.charts import (plot_stocks, growth_line_chart)
+from analysis.performance import (calculate_efficiency_metrics, calculate_stock_metrics)
 
-from analysis.performance import ( calculate_efficiency_metrics, calculate_stock_metrics)
-
-from analysis.growth import(get_metric_series, calculate_growth_series)
 from visuals.layout import (get_page_header, col_display_metric, display_MetricData, col_display_insights)
 from analysis.insights import (ratio_insights, growth_insights, valuation_insights, efficiency_insights)
-from utils.formatter import format_large_number, highlight_df_bounds
+from utils.formatter import (format_large_number, highlight_df_bounds)
 
 
 def main():
-
     # create sidebar for user inputs, display results on page
     st.sidebar.title("📊 Financial Analyzer")
     st.sidebar.markdown("<hr style='margin-top: 5px; margin-bottom: 20px;'>", unsafe_allow_html=True)
-    
-
 
     # get primary and compare ticker_names from user
     st.sidebar.header("Compare Companies")
-    ticker1 = st.sidebar.text_input("Primary Ticker", value="AAPL")
+    ticker1 = st.sidebar.text_input("Primary Ticker")
     ticker2 = st.sidebar.text_input("Compare With (Optional)")
 
-    # show calculation options
+    # show analysis options
     display = st.sidebar.radio("Display:", ['Core Financial Ratios', 'Growth Metrics',
                                'Valuation Metrics', 'Stock Performance Metrics', 'Cash Flow & Efficiency'])
-    # st.sidebar.markdown("---")
     st.sidebar.markdown("<hr style='margin-top: 5px; margin-bottom: 20px;'>", unsafe_allow_html=True)
 
 
@@ -46,7 +38,7 @@ def main():
         financials, balance_sheet, cash_flows = get_financial_statements(ticker1)
         hist1 = get_price_history(ticker1)
 
-        # if comparing, get ticker2 info
+        # if comparing with a valid ticker, get ticker2 info
         if ticker2 and ticker_exists(ticker2):
             ticker2_name = get_company_name(ticker2)
             financials2, balance_sheet2, cash_flows2 = get_financial_statements(ticker2)
@@ -57,9 +49,9 @@ def main():
             ticker2 = None
 
 
-        # -----------------------------------#
-        #   Core Financial Ratios -- DONE
-        # -----------------------------------#
+        # -----------------------------------
+        #   Core Financial Ratios
+        # -----------------------------------
         if display == "Core Financial Ratios":
             get_page_header("Core Financial Ratios", "Key financial ratios to assess company performance.")
 
@@ -71,14 +63,12 @@ def main():
                 
             else:
                 insights = ratio_insights(ratio_metrics1)
-                # display_MetricData(ticker1_name, ratio_metrics1, insights)
-                # display_metric(ticker1_name, ratio_metrics1, insights)
                 col_display_insights(ticker1_name, ratio_metrics1, insights, False)
 
                 
-        # -----------------------------------#
-        #  Growth Metrics -- ADD INSIGHTS ?
-        # -----------------------------------#
+        # -----------------------------------
+        #  Growth Metrics
+        # -----------------------------------
         elif display == "Growth Metrics":
             get_page_header("Growth Metrics", "Year-over-year growth rates for key financial metrics.")
 
@@ -87,9 +77,9 @@ def main():
 
             for tab, label in zip(tabs, GROWTH_LABELS):
                 with tab:
-                    series1 = get_metric_series(financials, cash_flows, label)
+                    series1 = get_growth_metrics(financials, cash_flows, label)
                     if ticker2:
-                        series2 = get_metric_series(financials2, cash_flows2, label)
+                        series2 = get_growth_metrics(financials2, cash_flows2, label)
                         df = pd.concat([series1, series2], axis=1).dropna()
                         df.columns = [ticker1_name, ticker2_name]
                     else:
@@ -112,10 +102,9 @@ def main():
                         st.caption(f"⚠️ {label} data not available.")
 
 
-
-        # -----------------------------------#
+        # -----------------------------------
         #   Valuation Metrics -- DONE
-        # -----------------------------------#
+        # -----------------------------------
         elif display == "Valuation Metrics":
             get_page_header("Valuation Metrics", "Key valuation metrics to assess stock price relative to earnings and growth.")
 
@@ -131,9 +120,9 @@ def main():
                 # display_MetricData(ticker1_name, valuation_series1, insights)
                 
 
-        # -----------------------------------#
-        #   Stock Metrics -- CHANGE CUMULATIVE RETURN TO GRAPH
-        # -----------------------------------#
+        # -----------------------------------
+        #   Stock Metrics
+        # -----------------------------------
         elif display == "Stock Performance Metrics":
             get_page_header("Stock Performance Metrics", "Historical stock price performance and key stock metrics.")
 
@@ -150,11 +139,11 @@ def main():
             # display cumilative return graph
 
         
-        # -----------------------------------#
-        #   Cash Flow & Efficiency -- MAKE MORE COMPREHENSIVE
-        # -----------------------------------#
+        # -----------------------------------
+        #   Cash Flow & Efficiency
+        # -----------------------------------
         elif display == "Cash Flow & Efficiency":
-            
+            # allow user to compare up to 4 companies
             ticker3 = st.sidebar.text_input("Enter Third Ticker") 
             ticker4 = st.sidebar.text_input("Enter Fourth Ticker")  
             
@@ -166,6 +155,7 @@ def main():
             efficiency_metrics1 = calculate_efficiency_metrics(cash_flows, financials, balance_sheet)
             insights = efficiency_insights(efficiency_metrics1)
             
+            # gather efficiency metrics for all companies to compare
             companies = {ticker1: efficiency_metrics1}
             if ticker2:
                 efficiency_metrics2 = calculate_efficiency_metrics(cash_flows2, financials2, balance_sheet2)
@@ -179,6 +169,7 @@ def main():
                 efficiency_metrics4 = calculate_efficiency_metrics(cash_flows4, financials4, balance_sheet4)
                 companies[ticker4] = efficiency_metrics4
 
+            # display key for highlight colors
             st.markdown("""
                 <ul style='font-size:0.8rem; padding-left: 20px;'>
                 <li>
@@ -188,7 +179,9 @@ def main():
                     High Outlier: <span style='color: yellow; padding: 2px 6px;'>Above normal range</span>
                 </li>
                 </ul>
-                """, unsafe_allow_html=True)
+                """, 
+                unsafe_allow_html=True
+            )
 
                             
             for label in CF_LABELS:
@@ -206,10 +199,58 @@ def main():
                 
                 st.dataframe(styled_df)
 
-            
 
     else:
-        st.warning("Please enter a valid primary ticker symbol")
+        # st.title("Overview")
+        get_page_header("Overview", )
+        # st.text("Enter primary ticker symbol to analyze and compare key financial metrics for publicly traded companies.")
+        st.markdown("""
+            <p>Enter primary ticker symbol to analyze and compare key financial metrics for publicly traded companies.</p>
+            <p style='margin-top: -0.75rem'>Common Ticker Symbols:</p>
+            <ul style='font-size:1rem; padding-left: 20px;'>
+                <li> AAPL: Apple Inc. </li>
+                <li> MSFT: Microsoft Corporation </li>
+                <li> AMZN: Amazon.com, Inc. </li>
+                <li> GOOG: Alphabet Inc. (Class C) </li>
+            </ul>
+            """, 
+            unsafe_allow_html=True
+        )
+        st.markdown("""
+            <h4>Analysis Options:</h4>
+                <h6>Core Financial Ratios</h6>
+                    <ul style='font-size:1rem; padding-left: 20px;'>
+                        <li> View key financial ratios and corresponding insights or compare ratios between two companies. </li>
+                        <li> Profit Margin, ROE, Debt-to-Equity, Current Ratio, Quick Ratio</li>
+                    </ul>
+                <h6>Growth Metrics</h6>
+                    <ul style='font-size:1rem; padding-left: 20px;'>
+                        <li> Displays graphs of year-over-year growth rates for key financial metrics.</li>
+                        <li> Total Revenue, Net Income, Diluted EPS, Free Cash Flows </li>
+                    </ul>
+                <h6>Valuation Metrics</h6>
+                    <ul style='font-size:1rem; padding-left: 20px;'>
+                        <li> View valuation metrics and corresponding insights or compare metrics between two companies.</li>
+                        <li> Trailing P/E, Forward P/E, PEG Ratio, Price-to-Book, Enterprise Value, Market Cap, EV/EBITA, EV/Revenue </li>
+                    </ul>
+                <h6>Stock Performance Metrics</h6>
+                    <ul style='font-size:1rem; padding-left: 20px;'>
+                        <li> Displays graph of closing price of shares and stock perfomance metrics for primary ticker and optional compare ticker.</li>
+                        <li> Closing price over last year, volatility, Sharpe Ratio, Max Drawdown, Cumulative Return </li>
+                    </ul>
+                <h6>Cash Flows & Efficiency</h6>
+                    <ul style='font-size:1rem; padding-left: 20px;'>
+                        <li> Displays tables of 1-4 companies comparing efficiency metrics and highlighting outliers outside of standard range.</li>
+                        <li> Free Cash Flows, FCF Margin, Operating Margin, Asset Turnover </li>
+                    </ul>
+            """, 
+            unsafe_allow_html=True
+        )
+
+        if ticker1 and not ticker_exists(ticker1):
+            st.sidebar.warning("Please enter a valid primary ticker symbol")
+        else:
+            st.sidebar.info("Enter a primary ticker symbol to begin analysis.")
 
 
 main()

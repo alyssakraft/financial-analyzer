@@ -11,7 +11,9 @@ def calculate_growth_series(series):
     """
     return series.pct_change().dropna()
 
-def get_metric_series(financials, cash_flows, label):
+# store growth metrics in cache for performance
+@st.cache_data
+def get_growth_metrics(financials, cash_flows, label):
     """
     Extracts a time series for a given label from the financials DataFrame.
     Returns a Series indexed by year.
