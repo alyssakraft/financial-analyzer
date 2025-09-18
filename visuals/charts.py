@@ -1,4 +1,8 @@
-#chart functions (price, bar, radar, etc.)
+"""
+visuals/charts.py
+
+Provides charting utilities using Plotly and Streamlit.
+"""
 
 import plotly.graph_objects as go
 import plotly.express as px
@@ -6,9 +10,13 @@ import streamlit as st
 from data.fetcher import (get_stock_object, get_price_history)
 
 def plot_stocks(ticker: str, ticker2: str = None):
+    """Plot stock price history for one or two tickers."""
+    # fetch 1 year price history (default) for primary ticker and create figure
     hist = get_price_history(ticker)
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=hist.index, y=hist['Close'], name=ticker))
+
+    # add second ticker if provided
     if ticker2:
         hist2 = get_price_history(ticker2)
         fig.add_trace(go.Scatter(x=hist2.index, y=hist2['Close'], name=ticker2))
@@ -16,11 +24,12 @@ def plot_stocks(ticker: str, ticker2: str = None):
 
     else:
         fig.update_layout(title=f"{ticker} Closing Price (1Y)", xaxis_title="Date", yaxis_title="Price")
+    
     st.plotly_chart(fig, use_container_width=True)
 
 def growth_line_chart(ticker, data, ticker2=None, data2=None):
-    # st.text(ticker )
-
+    """Create a line chart for growth data for one company"""
+    # Create line chart for growth data
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=data.index.astype(str), 
@@ -29,8 +38,7 @@ def growth_line_chart(ticker, data, ticker2=None, data2=None):
         name=data.name
     ))
 
-    # Ensure x-axis treats values as categories
-    fig.update_xaxes(type='category')  
+    fig.update_xaxes(type='category')  # Ensure x-axis is treated as categorical
     fig.update_layout(title=f"{ticker} {data.name} Growth Over Time", xaxis_title="Year", yaxis_title="Percent Change", yaxis_tickformat=".2%")
 
     st.plotly_chart(fig, use_container_width=True)

@@ -1,10 +1,15 @@
+"""
+data/fetcher.py
+
+Handles data fetching from yfinance.
+"""
+
 import yfinance as yf
 import pandas as pd
-# remove after testing
-import streamlit as st
-
 
 def ticker_exists(ticker):
+    """check if ticker exists in yfinance."""
+
     try:
         stock = yf.Ticker(ticker)
         info = stock.info
@@ -64,8 +69,6 @@ def get_value_by_label(df, possible_labels):
     Searches for the first matching label in a DataFrame index.
     Returns the value from the most recent column.
     """
-    # st.dataframe(df)
-    # st.dataframe(possible_labels)
     for label in possible_labels:
         if label in df.index:
             return df.loc[label]  # Most recent year

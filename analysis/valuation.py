@@ -1,3 +1,9 @@
+"""
+analysis/valuation.py
+
+Calculates valuation metrics from company info.
+"""
+
 from data.fetcher import get_company_info
 from utils.constants import TRAILING_PE, FORWARD_PE, PEG, PB, ENTERPRISE_VALUE, MARKET_CAP, EV_EBITDA, EV_REVENUE
 from utils.formatter import format_large_number
@@ -6,6 +12,7 @@ import streamlit as st
 
 def calculate_forward_peg(info):
     """PE / Earnings Growth"""
+    
     pe = info.get("forwardPE")
     growth = info.get("earningsGrowth")
 

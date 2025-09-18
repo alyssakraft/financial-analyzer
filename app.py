@@ -1,3 +1,9 @@
+"""
+app.py
+
+Main application file for the Financial Analyzer Streamlit app.
+"""
+
 import streamlit as st
 import pandas as pd
 
@@ -14,6 +20,8 @@ from visuals.layout import (get_page_header, col_display_metric, display_MetricD
 from analysis.insights import (ratio_insights, growth_insights, valuation_insights, efficiency_insights)
 from utils.formatter import (format_large_number, highlight_df_bounds)
 
+st.set_page_config(page_title="Financial Analyzer", page_icon="📊", layout="wide")
+
 
 def main():
     # create sidebar for user inputs, display results on page
@@ -25,7 +33,7 @@ def main():
     ticker1 = st.sidebar.text_input("Primary Ticker")
     ticker2 = st.sidebar.text_input("Compare With (Optional)")
 
-    # show analysis options
+    # show analysis options in sidebar
     display = st.sidebar.radio("Display:", ['Core Financial Ratios', 'Growth Metrics',
                                'Valuation Metrics', 'Stock Performance Metrics', 'Cash Flow & Efficiency'])
     st.sidebar.markdown("<hr style='margin-top: 5px; margin-bottom: 20px;'>", unsafe_allow_html=True)
@@ -44,6 +52,7 @@ def main():
             financials2, balance_sheet2, cash_flows2 = get_financial_statements(ticker2)
             hist2 = get_price_history(ticker2)
             ticker_names = [ticker1_name, ticker2_name]
+
         elif ticker2:
             st.sidebar.error("⚠️ Invalid compare ticker symbol.")
             ticker2 = None
@@ -53,6 +62,8 @@ def main():
         #   Core Financial Ratios
         # -----------------------------------
         if display == "Core Financial Ratios":
+            #Displays core financial ratios and insights or compares ratios between two companies.
+
             get_page_header("Core Financial Ratios", "Key financial ratios to assess company performance.")
 
             ratio_metrics1 = calculate_ratios(financials, balance_sheet)
@@ -70,6 +81,8 @@ def main():
         #  Growth Metrics
         # -----------------------------------
         elif display == "Growth Metrics":
+            # Displays growth metrics with line charts and insights
+
             get_page_header("Growth Metrics", "Year-over-year growth rates for key financial metrics.")
 
             tabs = st.tabs(GROWTH_LABELS)
@@ -78,25 +91,29 @@ def main():
             for tab, label in zip(tabs, GROWTH_LABELS):
                 with tab:
                     series1 = get_growth_metrics(financials, cash_flows, label)
-                    if ticker2:
-                        series2 = get_growth_metrics(financials2, cash_flows2, label)
-                        df = pd.concat([series1, series2], axis=1).dropna()
-                        df.columns = [ticker1_name, ticker2_name]
-                    else:
-                        df = series1.to_frame().dropna()
 
                     if series1 is not None:
+                        # calculate growth (pct change) series based on retrieved metric series
                         growth = calculate_growth_series(series1)
-                        growth.name = label
                         growth_line_chart(ticker1, growth)
 
-                        if not label == "Diluted EPS":
-                            df = df.style.format(format_large_number)
-                        st.markdown(f"<hr style='margin-top: -5px; margin-bottom: 20px; border: 2px solid #181C24;'>", unsafe_allow_html=True)
+                        if label in insights:
+                            st.caption(insights[label])
 
-                        # st.text(f"{label} Over Time")
-                        # st.dataframe(df)
-                        st.text(insights[label])
+                        # if comparing, get growth metrics for second ticker and display side by side
+                        if ticker2:
+                            series2 = get_growth_metrics(financials2, cash_flows2, label)
+                            df = pd.concat([series1, series2], axis=1).dropna()
+
+                            df.columns = [ticker1_name, ticker2_name]
+
+                            # format diluted EPS for easier comparison of numbers
+                            if not label == "Diluted EPS":
+                                df = df.style.format(format_large_number)
+                            
+                            st.markdown(f"<hr style='margin-top: 5px; margin-bottom: 20px; border: 2px solid #181C24;'>", unsafe_allow_html=True)
+                            st.text(f"Comparing {label} Over Time")
+                            st.dataframe(df)
                         
                     else:
                         st.caption(f"⚠️ {label} data not available.")
@@ -106,9 +123,11 @@ def main():
         #   Valuation Metrics -- DONE
         # -----------------------------------
         elif display == "Valuation Metrics":
+            # Display valuation metrics and insights or compare between two companies
+
             get_page_header("Valuation Metrics", "Key valuation metrics to assess stock price relative to earnings and growth.")
 
-            # get valuation calculations as series, good for scalability
+            # Get valuation calculations as series, good for scalability
             valuation_series1 = get_valuation_metrics(ticker1)
 
             if ticker2:
@@ -117,13 +136,14 @@ def main():
             else:
                 insights = valuation_insights(valuation_series1)
                 col_display_insights(ticker1_name, valuation_series1, insights)
-                # display_MetricData(ticker1_name, valuation_series1, insights)
                 
 
         # -----------------------------------
         #   Stock Metrics
         # -----------------------------------
         elif display == "Stock Performance Metrics":
+            # Display the share price and metrics for one or two companies
+
             get_page_header("Stock Performance Metrics", "Historical stock price performance and key stock metrics.")
 
             stock_series1 = calculate_stock_metrics(hist1)
@@ -143,7 +163,10 @@ def main():
         #   Cash Flow & Efficiency
         # -----------------------------------
         elif display == "Cash Flow & Efficiency":
-            # allow user to compare up to 4 companies
+            # Display 1-4 company metrics side by side for comparison
+
+
+            # Allow user to compare up to enter 2 additional companies in sidebar
             ticker3 = st.sidebar.text_input("Enter Third Ticker") 
             ticker4 = st.sidebar.text_input("Enter Fourth Ticker")  
             
@@ -155,7 +178,7 @@ def main():
             efficiency_metrics1 = calculate_efficiency_metrics(cash_flows, financials, balance_sheet)
             insights = efficiency_insights(efficiency_metrics1)
             
-            # gather efficiency metrics for all companies to compare
+            # Gather efficiency metrics for all companies to compare
             companies = {ticker1: efficiency_metrics1}
             if ticker2:
                 efficiency_metrics2 = calculate_efficiency_metrics(cash_flows2, financials2, balance_sheet2)
@@ -182,14 +205,17 @@ def main():
                 """, 
                 unsafe_allow_html=True
             )
-
-                            
+      
             for label in CF_LABELS:
                 st.subheader(label)
+
                 if label in insights:
                     st.caption(insights[label])
+
                 df = pd.DataFrame({comp: companies[comp][label] for comp in companies if companies[comp][label] is not None})
                 df.index.name = 'Year'
+
+                # Ensure df is correctly styled based on format needeed for output
                 if label == "Free Cash Flows":
                     styled_df = df.style.format(format_large_number)
                 elif label == "FCF Margin" or label == "Operating Margin":
@@ -201,9 +227,8 @@ def main():
 
 
     else:
-        # st.title("Overview")
+        # Landing view. Give overview of what each Display does
         get_page_header("Overview", )
-        # st.text("Enter primary ticker symbol to analyze and compare key financial metrics for publicly traded companies.")
         st.markdown("""
             <p>Enter primary ticker symbol to analyze and compare key financial metrics for publicly traded companies.</p>
             <p style='margin-top: -0.75rem'>Common Ticker Symbols:</p>

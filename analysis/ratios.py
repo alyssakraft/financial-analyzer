@@ -1,4 +1,9 @@
 # analysis/ratios.py
+"""
+analysis/ratios.py
+
+Calculates key financial ratios from financial statements.
+"""
 
 import pandas as pd
 import streamlit as st
@@ -11,6 +16,7 @@ from utils.constants import PM, ROE, DE, CR, QR
 @st.cache_data
 def calculate_ratios(financials, balance_sheet):
     """Calculate all financial ratios and return as a series."""
+
     series = {
         PM: (calculate_profit_margin(financials)),
         ROE: calculate_ROE(financials, balance_sheet),
@@ -23,6 +29,7 @@ def calculate_ratios(financials, balance_sheet):
 
 def calculate_profit_margin(financials: pd.DataFrame):
     """Net Income / Revenue"""
+
     try:
         revenue = get_value_by_label(financials, ['Total Revenue', 'Revenue'])
         net_income = get_value_by_label(financials, ['Net Income'])
@@ -38,6 +45,7 @@ def calculate_profit_margin(financials: pd.DataFrame):
 
 def calculate_ROE(financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> float:
     """Net Income / Shareholder Equity"""
+
     try:
         net_income = get_value_by_label(financials, ['Net Income'])
         equity = get_value_by_label(balance_sheet, ['Stockholders Equity', 'Total Stockholders Equity'])
@@ -53,6 +61,7 @@ def calculate_ROE(financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> floa
 
 def calculate_DE_ratio(balance_sheet: pd.DataFrame) -> float:
     """Total Liabilities / Shareholder Equity"""
+
     try:
         liabilities = get_value_by_label(balance_sheet, ['Total Liabilities'])
 
@@ -77,6 +86,7 @@ def calculate_DE_ratio(balance_sheet: pd.DataFrame) -> float:
 
 def calculate_current_ratio(balance_sheet: pd.DataFrame) -> float:
     """Current Assets / Current Liabilities"""
+
     try:
         current_assets = get_value_by_label(balance_sheet, ['Total Current Assets', 'Current Assets'])
         current_liabilities = get_value_by_label(balance_sheet, ['Total Current Liabilities', 'Current Liabilities'])
@@ -91,7 +101,8 @@ def calculate_current_ratio(balance_sheet: pd.DataFrame) -> float:
 
 
 def calculate_quick_ratio(balance_sheet: pd.DataFrame) -> float:
-    """(Current Assets − Inventory) / Current Liabilities"""
+    """(Current Assets - Inventory) / Current Liabilities"""
+
     try:
         current_assets = get_value_by_label(balance_sheet, ['Total Current Assets', 'Current Assets'])
         inventory = get_value_by_label(balance_sheet, ['Inventory'])
@@ -108,6 +119,7 @@ def calculate_quick_ratio(balance_sheet: pd.DataFrame) -> float:
 
 def calculate_interest_coverage(financials: pd.DataFrame) -> float:
     """EBIT / Interest Expense"""
+    
     try:
         ebit = get_value_by_label(financials, ['EBIT'])
         interest = get_value_by_label(financials, ['Interest Expense'])

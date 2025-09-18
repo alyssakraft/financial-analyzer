@@ -1,20 +1,27 @@
-# format numbers, percentages, currency, etc.
+"""
+utils/formatter.py
 
-def format_delta(current, previous, pct=False):
+Provides formatting utilities for financial data.
+"""
+
+def format_delta(current, previous, is_pct=False):
+    """Format the change between current and previous values."""
+
     if previous is [None, 0]:
         return None
-    if pct:
+    if is_pct:
         return (current - previous) / abs(previous) * 100
     else:
         return current - previous
 
 def format_currency(value, currency="$", decimals=2):
+    """Format a number as currency."""
     if value is None:
         return None
     return f"{currency}{value:,.{decimals}f}"
 
-# format large numbers with K, M, B suffixes
 def format_large_number(value):
+    """Format large numbers with K, M, B, T suffixes."""
     if value is None:
         return None
     abs_value = abs(value)
@@ -31,6 +38,8 @@ def format_large_number(value):
 
     
 def highlight_df_bounds(df, lower=None, upper=None, low_color='lightcoral', high_color='yellow'):
+    """Highlight DataFrame values outside specified bounds."""
+
     numeric_cols = df.select_dtypes(include='number').columns
 
     def style_func(s):

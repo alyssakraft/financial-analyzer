@@ -1,28 +1,29 @@
-# visuals/layout.py
+"""
+visuals/layout.py
+
+Provides layout and display utilities for Streamlit.
+"""
 
 import streamlit as st
 import pandas as pd
 from data.metric_data import MetricData
 
-# store page header in cache for performance
+
 def get_page_header(title, subtitle=None):
     """
     Displays a page header with an optional subtitle in Streamlit.
     """
-    # st.title(title)
+    # markdown for title with large font and bold weight
     st.markdown(f"<p style='font-size: 2.75rem; font-weight: 700; margin: 0px;'>{title}</p>", unsafe_allow_html=True)
 
-
+    # if subtitle is provided, display it with smaller font and lighter color
     if subtitle:
-        # markdown for subtitle with smaller font and lighter color
         st.markdown(f"<h1 style='font-size:0.875rem; font-weight: 450; color: #888888; margin-top: -1.5em;'>{subtitle}</h1>", unsafe_allow_html=True)
-        st.markdown("<hr style='margin-top: -10px; margin-bottom: 5px; border: 5px solid #212D41'>", unsafe_allow_html=True)
-    else:
-        st.markdown("<hr style='margin-top: -10px; margin-bottom: 5px; border: 5px solid #212D41'>", unsafe_allow_html=True)
-        
+
+    # horizontal rules for visual separation    
+    st.markdown("<hr style='margin-top: -10px; margin-bottom: 5px; border: 5px solid #212D41'>", unsafe_allow_html=True)
     st.markdown("<hr style='margin-top: -10px; margin-bottom: 5px; border: 5px solid #181C24'>", unsafe_allow_html=True)
     st.markdown("<hr style='margin-top: -10px; margin-bottom: 40px; border: 5px solid #11141A'>", unsafe_allow_html=True)
-    # st.markdown("<hr style='margin-top: -10px; margin-bottom: 30px; border: 5px solid #0F1116'>", unsafe_allow_html=True)
     
 
 
@@ -35,6 +36,7 @@ def safe_metricData(m: MetricData, is_second=False):
     else:
         label = m.name
 
+    # display metric based on available data
     if m.value is not None and m.delta is None:
         st.metric(label, m.formatted_value())
     elif m.delta is not None:
@@ -44,35 +46,19 @@ def safe_metricData(m: MetricData, is_second=False):
         st.caption(f"⚠️ {label} not available.")
 
 
-def safe_metric(label, value, format_str="{:.2f}", suffix="", delta=None, is_second=False):
-    """
-    Displays a Streamlit metric if value is valid, otherwise shows a caption.
-    """
-    if is_second:
-        label = ""  # hide name for second column to reduce clutter
-
-    if value is not None and delta is None:
-        st.metric(label, format_str.format(value) + suffix)
-    elif delta is not None:
-        st.metric(label, format_str.format(value) + suffix, delta=f"{delta:.2f}")
-    else:
-        st.text(label)
-        st.caption(f"⚠️ {label} not available.")
-
-
 def display_MetricData(label, data: dict, insights=None, is_second=False):
     """
     Displays a set of metrics in Streamlit with optional insights.
     """
+
+    # display section header
     st.subheader(label)
-    # st.markdown("<hr style='margin-top: -10px; margin-bottom: 30px;'>", unsafe_allow_html=True)
     st.markdown(f"<hr style='margin-top: -5px; margin-bottom: 20px; border: 2px solid #181C24;'>", unsafe_allow_html=True)
 
+    # display each metric and its insight if available
     for name, val in data.items():
         if isinstance(val, MetricData):
             safe_metricData(val, is_second=is_second)
-        else:
-            safe_metric(name, val, is_second=is_second)
 
         if insights is not None and name in insights:
                 st.info(insights[name])
@@ -98,24 +84,26 @@ def col_display_insights(ticker1, data, insights, no_delta=True):
 
     test_margin = 20
     col1, col2 = st.columns([2, 3])
+
+    # adjust height and margins based on whether deltas are present
     if no_delta:
         height = "82px"
-        margins = "5px"
-        margin_bottom_a = str(test_margin + 15) + "px"
+        insight_margins = "5px"
+        md_margin_bottom = "35px"
     else:
         height = "97.5px"
-        margins = "10px"
-        margin_bottom_a = str(test_margin + 10) + "px"
+        insight_margins = "10px"
+        md_margin_bottom = "30px"
 
-
+    # display headers
     with col1:
         st.subheader(ticker1)
-        st.markdown(f"<hr style='margin-top: -5px; margin-bottom: {margin_bottom_a}; border: 2px solid #181C24;'>", unsafe_allow_html=True)
+        st.markdown(f"<hr style='margin-top: -5px; margin-bottom: {md_margin_bottom}; border: 2px solid #181C24;'>", unsafe_allow_html=True)
     with col2:
         st.subheader("Key Insights")
         st.markdown(f"<hr style='margin-top: -5px; margin-bottom: 20px; border: 2px solid #181C24;'>", unsafe_allow_html=True)
 
-
+    # display metrics and insights side by side
     for name, val in data.items():
         with col1:
             safe_metricData(val)
@@ -124,8 +112,8 @@ def col_display_insights(ticker1, data, insights, no_delta=True):
         with col2:
             st.markdown(f"""
                 <div style='
-                    margin-bottom: {margins};
-                    margin-top: {margins};
+                    margin-bottom: {insight_margins};
+                    margin-top: {insight_margins};
                     background-color: #212D41;
                     border-radius: 8px;
                     border: 3px solid #1A2333;

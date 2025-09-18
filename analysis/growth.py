@@ -1,4 +1,9 @@
-# revenue, net income, EPS growth
+"""
+analysis/growth.py
+
+Handles revenue and net income growth visualizations.
+Includes Plotly line charts and commentary modules for trend analysis.
+"""
 
 import pandas as pd
 import streamlit as st
@@ -18,6 +23,7 @@ def get_growth_metrics(financials, cash_flows, label):
     Extracts a time series for a given label from the financials DataFrame.
     Returns a Series indexed by year.
     """
+    # Handle special case for Free Cash Flows
     if label not in financials.index:
         if label == "Free Cash Flows":
             series = calculate_fcf(cash_flows)
@@ -25,9 +31,8 @@ def get_growth_metrics(financials, cash_flows, label):
             return None
     else:
         series = financials.loc[label]
-    # Ensure index is datetime or year
+        # Ensure index is datetime or year
         if not isinstance(series.index[0], (int, float)):
-            # st.table(series)
             series.index = pd.to_datetime(series.index).year
         
     return series.sort_index()

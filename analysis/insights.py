@@ -1,10 +1,14 @@
-# analysis/insights.py
+"""
+analysis/insights.py
+
+Generates insights based on financial ratios and valuation metrics.
+Provides commentary for growth and efficiency metrics.
+"""
 
 from utils.constants import *  # Import all constants
-import streamlit as st
-# from data.metric_data import MetricData
 
 def ratio_insights(d: dict):
+    """Generate insights based on financial ratios values."""
     insights = {}
 
     if PM in d:
@@ -15,6 +19,7 @@ def ratio_insights(d: dict):
             elif val > 0.1: insights[PM] = "Moderate Profit Margin: The company has a decent level of profitability."
             elif val > 0: insights[PM] = "Low Profit Margin: The company is barely profitable and may struggle to cover costs."
             else: insights[PM] = "Negative Profit Margin: The company is operating at a loss."
+
     if ROE in d:
         val = d[ROE].value
         if val is not None:
@@ -22,18 +27,21 @@ def ratio_insights(d: dict):
             elif val > 0.1: insights[ROE] = "Average ROE: The company has a reasonable return on equity."
             elif val > 0: insights[ROE] = "Weak ROE: The company is generating low returns on shareholders' equity."
             else: insights[ROE] = "Negative ROE: The company is not generating profits from shareholders' equity."
+
     if DE in d:
         val = d[DE].value
         if val is not None:
             if val < 0.5: insights[DE] = "Low Debt-to-Equity: The company has a conservative capital structure with low reliance on debt."
             elif val < 1: insights[DE] = "Moderate Debt-to-Equity: The company has a balanced approach to using debt and equity for financing."
             else: insights[DE] = "High Debt-to-Equity: The company is heavily reliant on debt, which may increase financial risk."
+
     if CR in d:
         val = d[CR].value
         if val is not None:
             if val > 2: insights[CR] = "Strong Current Ratio: The company has a strong ability to cover its short-term liabilities with short-term assets."
             elif val > 1: insights[CR] = "Adequate Current Ratio: The company can meet its short-term obligations, but may face liquidity issues."
             else: insights[CR] = "Weak Current Ratio: The company may struggle to cover its short-term liabilities, indicating potential liquidity problems."
+
     if QR in d:
         val = d[QR].value
         if val is not None:
@@ -44,6 +52,7 @@ def ratio_insights(d: dict):
     return insights
 
 def growth_insights(d):
+    """Generate commentary for growth metrics."""
     insights = {}
     if REVENUE in d:
         insights[REVENUE] = "Revenue Growth indicates the increase in a company's sales over a specific period. Consistent revenue growth is a positive sign of business expansion and market demand."
@@ -56,6 +65,7 @@ def growth_insights(d):
     return insights
 
 def valuation_insights(d: dict):
+    """Generate insights based on valuation metrics values."""
     insights = {}
 
     if PEG in d:
@@ -92,12 +102,14 @@ def valuation_insights(d: dict):
             if val < 10: insights[EV_EBITDA] = "Low EV/EBITDA Ratio: The company may be undervalued or has strong earnings relative to its enterprise value."
             elif val < 15: insights[EV_EBITDA] = "Average EV/EBITDA Ratio: The company is fairly valued compared to its earnings."
             else: insights[EV_EBITDA] = "High EV/EBITDA Ratio: The company may be overvalued or has weak earnings relative to its enterprise value."
+    
     if EV_REVENUE in d:
         val = d[EV_REVENUE].value
         if val is not None:
             if val < 2: insights[EV_REVENUE] = "Low EV/Revenue Ratio: The company may be undervalued or has strong revenue relative to its enterprise value."
             elif val < 5: insights[EV_REVENUE] = "Average EV/Revenue Ratio: The company is fairly valued compared to its revenue."
             else: insights[EV_REVENUE] = "High EV/Revenue Ratio: The company may be overvalued or has weak revenue relative to its enterprise value."
+    
     if MARKET_CAP in d:
         val = d[MARKET_CAP].value
         if val is not None:
@@ -106,6 +118,7 @@ def valuation_insights(d: dict):
             elif val > 2_000_000_000: insights[MARKET_CAP] = "Mid Cap: The company has growth potential but may be more volatile than larger companies."
             elif val > 300_000_000: insights[MARKET_CAP] = "Small Cap: The company may offer high growth potential but comes with higher risk and volatility."
             else: insights[MARKET_CAP] = "Micro Cap: The company is very small and may be highly speculative with significant risk."
+    
     if ENTERPRISE_VALUE in d:
         val = d[ENTERPRISE_VALUE].value
         if val is not None:
@@ -117,14 +130,18 @@ def valuation_insights(d: dict):
     return insights
 
 def efficiency_insights(d: dict):
+    """Generate commentary for efficiency metrics."""
     insights = {}
 
     if FCF in d:
         insights[FCF] = "Free Cash Flow (FCF) represents the cash a company generates after accounting for cash outflows to support operations and maintain its capital assets. Positive FCF indicates that a company has sufficient liquidity to pursue opportunities that enhance shareholder value."
+
     if FCF_MARGIN in d:
         insights[FCF_MARGIN] = "Free Cash Flow Margin indicates the percentage of revenue that is converted into free cash flow. A higher FCF margin suggests that a company is efficient at generating cash from its revenue, which can be used for growth, debt reduction, or returning value to shareholders."
+
     if OP_MARGIN in d:
         insights[OP_MARGIN] = "Operating Margin measures the percentage of revenue left after covering operating expenses. A higher operating margin indicates better efficiency and profitability from core business operations."
+        
     if AT in d:
         insights[AT] = "Asset Turnover Ratio indicates how efficiently a company uses its assets to generate revenue. A higher asset turnover ratio suggests that the company is effectively utilizing its assets to produce sales."
 
