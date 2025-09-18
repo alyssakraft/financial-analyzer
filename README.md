@@ -55,7 +55,7 @@ A web app for retrieving and analyzing company financial metrics, built with Str
 This app was built with modularity and clarity in mind:
 
 - Reusable functions for formatting, commentary and error handling
-- Intuitive layour with labeled sections and dynamic tooltips
+- Intuitive layout with labeled sections and dynamic tooltips
 - Clean codebase for easy extension and review
 
 ## Future Enhancements
@@ -66,4 +66,5 @@ This app was built with modularity and clarity in mind:
 ## Author
 
 Alyssa Kraft
+
 [Github Profile](https://github.com/alyssakraft) [LinkedIn](www.linkedin.com/in/alyssa-g-kraft)
