@@ -5,7 +5,6 @@ Handles data fetching from yfinance.
 """
 
 import yfinance as yf
-import pandas as pd
 
 def ticker_exists(ticker):
     """check if ticker exists in yfinance."""

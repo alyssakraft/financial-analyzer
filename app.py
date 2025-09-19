@@ -230,7 +230,7 @@ def main():
         # Landing view. Give overview of what each Display does
         get_page_header("Overview", )
         st.markdown("""
-            <p>Enter primary ticker symbol to analyze and compare key financial metrics for publicly traded companies.</p>
+            <p>Enter primary ticker symbol to analyze and compare key financial metrics for publicly traded companies. All data is up to date, retrieved from Yahoo Finance.</p>
             <p style='margin-top: -0.75rem'>Common Ticker Symbols:</p>
             <ul style='font-size:1rem; padding-left: 20px;'>
                 <li> AAPL: Apple Inc. </li>
@@ -243,27 +243,27 @@ def main():
         )
         st.markdown("""
             <h4>Analysis Options:</h4>
-                <h6>Core Financial Ratios</h6>
+                <h6 style='color: #5C6B9C'>Core Financial Ratios</h6>
                     <ul style='font-size:1rem; padding-left: 20px;'>
                         <li> View key financial ratios and corresponding insights or compare ratios between two companies. </li>
                         <li> Profit Margin, ROE, Debt-to-Equity, Current Ratio, Quick Ratio</li>
                     </ul>
-                <h6>Growth Metrics</h6>
+                <h6 style='color: #5C6B9C'>Growth Metrics</h6>
                     <ul style='font-size:1rem; padding-left: 20px;'>
                         <li> Displays graphs of year-over-year growth rates for key financial metrics.</li>
                         <li> Total Revenue, Net Income, Diluted EPS, Free Cash Flows </li>
                     </ul>
-                <h6>Valuation Metrics</h6>
+                <h6 style='color: #5C6B9C'>Valuation Metrics</h6>
                     <ul style='font-size:1rem; padding-left: 20px;'>
                         <li> View valuation metrics and corresponding insights or compare metrics between two companies.</li>
                         <li> Trailing P/E, Forward P/E, PEG Ratio, Price-to-Book, Enterprise Value, Market Cap, EV/EBITA, EV/Revenue </li>
                     </ul>
-                <h6>Stock Performance Metrics</h6>
+                <h6 style='color: #5C6B9C'>Stock Performance Metrics</h6>
                     <ul style='font-size:1rem; padding-left: 20px;'>
-                        <li> Displays graph of closing price of shares and stock perfomance metrics for primary ticker and optional compare ticker.</li>
+                        <li> Displays graph of closing price of shares and stock performance metrics for primary ticker and optional compare ticker.</li>
                         <li> Closing price over last year, volatility, Sharpe Ratio, Max Drawdown, Cumulative Return </li>
                     </ul>
-                <h6>Cash Flows & Efficiency</h6>
+                <h6 style='color: #5C6B9C'>Cash Flows & Efficiency</h6>
                     <ul style='font-size:1rem; padding-left: 20px;'>
                         <li> Displays tables of 1-4 companies comparing efficiency metrics and highlighting outliers outside of standard range.</li>
                         <li> Free Cash Flows, FCF Margin, Operating Margin, Asset Turnover </li>

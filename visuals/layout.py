@@ -5,7 +5,6 @@ Provides layout and display utilities for Streamlit.
 """
 
 import streamlit as st
-import pandas as pd
 from data.metric_data import MetricData
 
 

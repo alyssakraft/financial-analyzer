@@ -9,7 +9,6 @@ import pandas as pd
 from data.fetcher import get_value_by_label
 import streamlit as st
 from data.metric_data import MetricData
-from utils.formatter import format_large_number
 from utils.constants import FCF, FCF_MARGIN, OP_MARGIN, AT, VOLATILITY, SHARPE_RATIO, MAX_DRAWDOWN, CUMULATIVE_RETURN
 
 def calculate_fcf(cash_flows):

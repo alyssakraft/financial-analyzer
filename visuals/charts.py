@@ -5,9 +5,8 @@ Provides charting utilities using Plotly and Streamlit.
 """
 
 import plotly.graph_objects as go
-import plotly.express as px
 import streamlit as st
-from data.fetcher import (get_stock_object, get_price_history)
+from data.fetcher import get_price_history
 
 def plot_stocks(ticker: str, ticker2: str = None):
     """Plot stock price history for one or two tickers."""
