@@ -56,7 +56,7 @@ def calculate_ROE(financials: pd.DataFrame, balance_sheet: pd.DataFrame) -> floa
         return MetricData(ROE, curr, format_delta(curr, prev, True), "{:.2%}")
 
     except (KeyError, IndexError, TypeError):
-        return None
+        return MetricData(ROE, None)
 
 
 def calculate_DE_ratio(balance_sheet: pd.DataFrame) -> float:
@@ -81,7 +81,7 @@ def calculate_DE_ratio(balance_sheet: pd.DataFrame) -> float:
         return MetricData(DE, curr, format_delta(curr, prev))
     
     except (KeyError, IndexError):
-        return None
+        return MetricData(DE, None)
 
 
 def calculate_current_ratio(balance_sheet: pd.DataFrame) -> float:
@@ -97,7 +97,7 @@ def calculate_current_ratio(balance_sheet: pd.DataFrame) -> float:
         return MetricData(CR, curr, format_delta(curr, prev))
 
     except (KeyError, IndexError, TypeError):
-        return None
+        return MetricData(CR, None)
 
 
 def calculate_quick_ratio(balance_sheet: pd.DataFrame) -> float:
@@ -106,6 +106,7 @@ def calculate_quick_ratio(balance_sheet: pd.DataFrame) -> float:
     try:
         current_assets = get_value_by_label(balance_sheet, ['Total Current Assets', 'Current Assets'])
         inventory = get_value_by_label(balance_sheet, ['Inventory'])
+        
         current_liabilities = get_value_by_label(balance_sheet, ['Total Current Liabilites', 'Current Liabilities'])
 
         curr = (current_assets[0] - inventory[0]) / current_liabilities[0]
@@ -114,7 +115,7 @@ def calculate_quick_ratio(balance_sheet: pd.DataFrame) -> float:
         return MetricData(QR, curr, format_delta(curr, prev))
 
     except (KeyError, IndexError, TypeError):
-        return None
+        return MetricData(QR, None)
 
 
 def calculate_interest_coverage(financials: pd.DataFrame) -> float:

@@ -25,7 +25,6 @@ def get_page_header(title, subtitle=None):
     st.markdown("<hr style='margin-top: -10px; margin-bottom: 40px; border: 5px solid #11141A'>", unsafe_allow_html=True)
     
 
-
 def safe_metricData(m: MetricData, is_second=False):
     """
     Displays a Streamlit metric if MetricData is valid, otherwise shows a caption.
@@ -56,12 +55,13 @@ def display_MetricData(label, data: dict, insights=None, is_second=False):
 
     # display each metric and its insight if available
     for name, val in data.items():
-        if isinstance(val, MetricData):
-            safe_metricData(val, is_second=is_second)
+        if val is not None:
+            if isinstance(val, MetricData):
+                safe_metricData(val, is_second=is_second)
 
-        if insights is not None and name in insights:
+            if insights is not None and name in insights:
                 st.info(insights[name])
-        st.markdown("<hr style='margin-top: 5px; margin-bottom: 5px; border: 1px solid #0F1116'>", unsafe_allow_html=True)
+            st.markdown("<hr style='margin-top: 5px; margin-bottom: 5px; border: 1px solid #0F1116'>", unsafe_allow_html=True)
 
 
 def col_display_metric(tickers, data1, data2):
@@ -104,33 +104,34 @@ def col_display_insights(ticker1, data, insights, no_delta=True):
 
     # display metrics and insights side by side
     for name, val in data.items():
-        with col1:
-            safe_metricData(val)
-            st.markdown("<hr style='margin-top: 5px; margin-bottom: 5px; border: 1px solid #0F1116;'>", unsafe_allow_html=True)
+        if name is not None:
+            with col1:
+                safe_metricData(val)
+                st.markdown("<hr style='margin-top: 5px; margin-bottom: 5px; border: 1px solid #0F1116;'>", unsafe_allow_html=True)
 
-        with col2:
-            st.markdown(f"""
-                <div style='
-                    margin-bottom: {insight_margins};
-                    margin-top: {insight_margins};
-                    background-color: #212D41;
-                    border-radius: 8px;
-                    border: 3px solid #1A2333;
-                    padding: 10px;
-                    height: {height};
-                    color: #D2EAE4;
-                    overflow-y: auto;
-                    font-size: 16px;
-                    line-height: 1.4;
-                    text-align: left;
-                    display: flex;
-                    align-items: center;
-                '>
-                    <div>
-                        <p style='margin: 0;'>{insights[name] if name in insights else "N/A"}</p>
+            with col2:
+                st.markdown(f"""
+                    <div style='
+                        margin-bottom: {insight_margins};
+                        margin-top: {insight_margins};
+                        background-color: #212D41;
+                        border-radius: 8px;
+                        border: 3px solid #1A2333;
+                        padding: 10px;
+                        height: {height};
+                        color: #D2EAE4;
+                        overflow-y: auto;
+                        font-size: 16px;
+                        line-height: 1.4;
+                        text-align: left;
+                        display: flex;
+                        align-items: center;
+                    '>
+                        <div>
+                            <p style='margin: 0;'>{insights[name] if name in insights else "N/A"}</p>
+                        </div>
                     </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("<hr style='margin-top: 5px; margin-bottom: 5px; border: 1px solid #0F1116;'>", unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
+                
+                st.markdown("<hr style='margin-top: 5px; margin-bottom: 5px; border: 1px solid #0F1116;'>", unsafe_allow_html=True)
 
