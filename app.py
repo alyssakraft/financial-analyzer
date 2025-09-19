@@ -30,8 +30,8 @@ def main():
 
     # get primary and compare ticker_names from user
     st.sidebar.header("Compare Companies")
-    ticker1 = st.sidebar.text_input("Primary Ticker")
-    ticker2 = st.sidebar.text_input("Compare With (Optional)")
+    ticker1 = st.sidebar.text_input("Primary Ticker").upper()
+    ticker2 = st.sidebar.text_input("Compare With (Optional)").upper()
 
     # show analysis options in sidebar
     display = st.sidebar.radio("Display:", ['Core Financial Ratios', 'Growth Metrics',
@@ -167,8 +167,8 @@ def main():
 
 
             # Allow user to compare up to enter 2 additional companies in sidebar
-            ticker3 = st.sidebar.text_input("Enter Third Ticker") 
-            ticker4 = st.sidebar.text_input("Enter Fourth Ticker")  
+            ticker3 = st.sidebar.text_input("Enter Third Ticker").upper()
+            ticker4 = st.sidebar.text_input("Enter Fourth Ticker").upper()
             
             get_page_header("Cash Flow & Efficiency Metrics", "Key cash flow and efficiency metrics to assess company performance.")
 
